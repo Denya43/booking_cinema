@@ -1,28 +1,23 @@
 package com.example.booking_cinema.controller;
 
 
-import com.example.booking_cinema.service.ProducerClass;
-import lombok.RequiredArgsConstructor;
-import org.apache.kafka.clients.admin.NewTopic;
-import org.springframework.context.annotation.Bean;
+import com.example.booking_cinema.service.ProducerService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-@RequiredArgsConstructor
+@RestController
 @RequestMapping("/kafka")
-public class KafkaController {
+public final class KafkaController {
+    private final ProducerService producerService;
 
-    private final ProducerClass producer;
-
-    @PostMapping("/publish")
-    public String sendMessage(@RequestParam("message") String message) {
-        this.producer.sendMessage(message);
-        return "Published successfully";
+    public KafkaController(ProducerService producerService) {
+        this.producerService = producerService;
     }
 
-    @Bean
-    public NewTopic adviceTopic() {
-        return new NewTopic("user", 3, (short)1);
+    @PostMapping(value = "/publish")
+    public void sendMessageToKafkaTopic(@RequestParam String message) {
+        producerService.sendMessage(message);
     }
 }
